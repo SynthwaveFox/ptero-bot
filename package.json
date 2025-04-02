@@ -1,5 +1,18 @@
 {
-  "dependencies": {
-    "discord.js": "^14.18.0"
-  }
+	"name": "examplebot",
+	"version": "JS.2.0.6",
+	"description": "A simple, easily extendable bot for your needs!",
+	"main": "Bot.js",
+	"keywords": [],
+	"author": "Linus Potocnik",
+	"license": "MIT",
+	"dependencies": {
+		"discord.js": "^14.15.3",
+		"dotenv": "^16.4.5"
+	},
+	"imports": {
+		"#events/*": "./events/*",
+		"#commands/*": "./events/commands/*.js"
+	},
+	"type": "module"
 }
