@@ -2,6 +2,8 @@ import {} from 'dotenv/config';
 import fs from 'fs';
 import { Client, GatewayIntentBits } from 'discord.js';
 import 'dotenv/config';
+import { handleButtonInteraction } from './events/commands/change_server_state.js';
+
 
 // Create a new Client with the Guilds intent
 const client = new Client({ intents: [GatewayIntentBits.Guilds] });
@@ -28,6 +30,14 @@ for (let event of events) {
 		});
 	}
 }
+
+client.on('interactionCreate', async (interaction) => {
+    if (interaction.isButton()) {
+        console.log(`Button interaction received: ${interaction.customId}`);
+        await handleButtonInteraction(interaction);
+    }
+});
+
 
 // Login with the credentials stored in .env
 client.login(process.env.BOT_TOKEN);
