@@ -1,4 +1,5 @@
 import { SlashCommandBuilder, EmbedBuilder } from 'discord.js';
+import { SERVER_IDS, SERVER_NAMES } from '../../config.js';  // Adjust path as necessary
 import axios from 'axios';
 
 const create = () => {
@@ -10,17 +11,6 @@ const create = () => {
 };
 
 const API_KEY = process.env.PTERO_TOKEN;
-const SERVER_IDS = [
-    '2cf9a7ff-d770-4649-86fb-617cb08e10b6',
-    '5c0b3278-3d1b-4faa-b532-705f1f83516d',
-    '17f4e985-dae0-4c8c-97a1-a352f9fdbcad'
-];
-
-const SERVER_NAMES = {
-    '2cf9a7ff-d770-4649-86fb-617cb08e10b6': 'Minecraft-Forge',
-    '5c0b3278-3d1b-4faa-b532-705f1f83516d': 'Minecraft-Vanilla',
-    '17f4e985-dae0-4c8c-97a1-a352f9fdbcad': 'Satisfactory',
-};
 
 // This function fetches the power state for a given server
 async function getServerPowerState(serverId) {
@@ -48,13 +38,6 @@ async function getServerPowerState(serverId) {
 
 // This function fetches the state for all servers and formats the embed message
 async function checkAllServers(interaction) {
-    // Check if the user has the required role
-    if (!interaction.member.roles.cache.has('722640858809106432')) {
-        return interaction.reply({
-            content: 'You do not have permission to use this command.',
-            ephemeral: true
-        });
-    }
 
     const results = await Promise.all(SERVER_IDS.map(getServerPowerState));
 
