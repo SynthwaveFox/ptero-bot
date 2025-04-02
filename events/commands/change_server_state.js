@@ -63,26 +63,14 @@ async function getServerResources() {
 
     let totalMemory = 0;
 
-    // Get the state of each server and calculate total memory for servers that are "on"
-    const statePromises = response.data.data.map(server => getServerPowerState(server.attributes.id));
-    const states = await Promise.all(statePromises);
-
-    // Iterate over servers and add memory if the server is "on"
     response.data.data.forEach(server => {
-      const serverState = states.find(state => state.serverId === server.attributes.id);
-      if (serverState && serverState.state === 'ON') { // Adjust 'ON' as per your server state value
-        totalMemory += server.attributes.limits.memory;
+    
+      var power_state = getServerPowerState(server.attributes.identifier);
+      if (power_state === "running" || power_state === "starting") {
+        totalMemory += server.attributes.limit.memory
       }
+    
     });
 
-    console.log('Total Memory of servers that are "on":', totalMemory);
-
-    return totalMemory;
-  
-  } catch (error) {
-    console.error('Error fetching server resources:', error);
-    return 0; // Return 0 if there's an error
   }
 }
-
-export { getNodeResources, getServerResources };
