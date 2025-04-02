@@ -25,30 +25,3 @@ async function getNodeResources() {
     return { maxMemory: 0 }; // Fallback if fetching fails
   }
 }
-
-
-async function getRunningServersMemory() {
-  try {
-    const url = `https://panel.snfx.dev/api/application/servers`;
-    const response = await axios.get(url, {
-      headers: {
-        'Authorization': `Bearer ${process.env.PTERO_APPLICATION_API_KEY}`,
-        'Accept': 'application/json',
-        'Content-Type': 'application/json'
-      }
-    });
-
-    let totalUsedMemory = 0;
-    
-    response.data.data.forEach(server => {
-      if (server.attributes.status === "running") { 
-        totalUsedMemory += server.attributes.limits.memory;
-      }
-    });
-    
-    return totalUsedMemory;
-  } catch (error) {
-    console.error('Error fetching running servers:', error);
-    return 0;  // Assume no servers are running if request fails
-  }
-}
