@@ -4,21 +4,31 @@ const once = true;
 const name = 'ready';
 
 async function invoke(client) {
-	const commands = fs
-		.readdirSync('./events/commands')
-		.filter((file) => file.endsWith('.js'))
-		.map((file) => file.slice(0, -3));
+    console.log('Starting dynamic command registration...');
 
-	const commandsArray = [];
+    try {
+        // Get all command files
+        const commands = fs
+            .readdirSync('./events/commands')
+            .filter((file) => file.endsWith('.js'))
+            .map((file) => file.slice(0, -3));
 
-	for (let command of commands) {
-		const commandFile = await import(`#commands/${command}`);
-		commandsArray.push(commandFile.create());
-	}
+        const commandsArray = [];
 
-	client.application.commands.set(commandsArray);
+        // Import each command dynamically
+        for (let command of commands) {
+            const commandFile = await import(`../events/commands/${command}.js`);
+            commandsArray.push(commandFile.create());
+        }
 
-	console.log(`Successfully logged in as ${client.user.tag}!`);
+        console.log('Registering dynamic global commands...');
+        await client.application.commands.set(commandsArray);
+
+        console.log('Successfully registered commands!');
+        console.log(`Logged in as ${client.user.tag}`);
+    } catch (error) {
+        console.error('Error registering commands:', error);
+    }
 }
 
 export { once, name, invoke };

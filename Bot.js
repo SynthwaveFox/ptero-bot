@@ -1,6 +1,7 @@
 import {} from 'dotenv/config';
 import fs from 'fs';
 import { Client, GatewayIntentBits } from 'discord.js';
+import 'dotenv/config';
 
 // Create a new Client with the Guilds intent
 const client = new Client({ intents: [GatewayIntentBits.Guilds] });
