@@ -5,10 +5,17 @@ import axios from 'axios';
 const create = () => {
     const command = new SlashCommandBuilder()
         .setName('server_status')
-        .setDescription('Gets the current power states of all gameservers.');
+        .setDescription('Gets the current power states of all gameservers.')
+        .setDMPermission(true); // Allows usage in bot DMs
 
-    return command.toJSON();
+    // Convert to JSON and add integration_types & contexts
+    const commandJSON = command.toJSON();
+    commandJSON.integration_types = [0, 1]; // Enables the command for both bots and My Apps
+    commandJSON.contexts = [0, 1, 2]; // 0 = Guilds, 1 = Bot DMs, 2 = User DMs (My Apps)
+
+    return commandJSON;
 };
+
 
 const API_KEY = process.env.PTERO_TOKEN;
 
