@@ -46,7 +46,7 @@ const invoke = async (interaction) => {
     }
 
     // Let Discord do the preview automatically
-    await interaction.editReply(mediaUrl);
+    await interaction.editReply("Here's your post!\n" + mediaUrl);
 };
 
 export { create, invoke };
