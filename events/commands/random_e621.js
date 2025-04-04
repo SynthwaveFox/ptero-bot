@@ -21,8 +21,7 @@ async function getE621Post() {
     try {
         const response = await axios.get(url, {
             headers: {
-                'User-Agent': 'DiscordBot/1.0 (by YOUR_USERNAME_HERE on e621)', // Replace with your e621 username
-                'Authorization': `Basic ${Buffer.from(e6apikey).toString('base64')}`,
+                'User-Agent': 'DiscordBot/1.0 (by AFlusteredFox2)', // Replace with your e621 username
                 'Accept': 'application/json',
                 'Content-Type': 'application/json'
             }
