@@ -27,8 +27,7 @@ async function getE621Post() {
             }
         });
 
-        const post = response.data.post;
-        return post.file.url;
+        return response.data.post?.file?.url ?? null;
 
     } catch (error) {
         console.error('Error fetching e621 post:', error);
@@ -46,13 +45,8 @@ const invoke = async (interaction) => {
         return;
     }
 
-    const embed = new EmbedBuilder()
-        .setTitle('🎲 Random e621 Post')
-        .setDescription(`[Click to view post](${mediaUrl})`)
-        .setURL(mediaUrl)
-        .setColor(0xFF8A00);
-
-    await interaction.editReply({ embeds: [embed] });
+    // Let Discord do the preview automatically
+    await interaction.editReply(mediaUrl);
 };
 
 export { create, invoke };
