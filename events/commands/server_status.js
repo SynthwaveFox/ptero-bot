@@ -6,7 +6,6 @@ const create = () => {
     const command = new SlashCommandBuilder()
         .setName('server_status')
         .setDescription('Gets the current power states of all gameservers.')
-        .setDMPermission(true); // Allows usage in bot DMs
 
     // Convert to JSON and add integration_types & contexts
     const commandJSON = command.toJSON();
