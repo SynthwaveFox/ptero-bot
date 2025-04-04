@@ -15,38 +15,63 @@ const create = () => {
 
 const e6apikey = process.env.e6ApiKey;
 
-async function getE621Post() {
+async function getE621Post(retries = 3) {
     const url = `https://e621.net/posts/random.json?tags=score:%3E=500+-young+-scat`;
 
-    try {
-        const response = await axios.get(url, {
-            headers: {
-                'User-Agent': 'DiscordBot/1.0 (by AFlusteredFox2)', // Replace with your e621 username
-                'Accept': 'application/json',
-                'Content-Type': 'application/json'
+    for (let attempt = 1; attempt <= retries; attempt++) {
+        try {
+            const response = await axios.get(url, {
+                headers: {
+                    'User-Agent': 'DiscordBot/1.0 (by your_username_here on e621)',
+                    'Accept': 'application/json'
+                }
+            });
+
+            return response.data.post?.file?.url ?? null;
+
+        } catch (error) {
+            console.warn(`e621 fetch attempt ${attempt} failed.`);
+            if (attempt === retries) {
+                console.error('All fetch attempts failed:', error);
             }
-        });
-
-        return response.data.post?.file?.url ?? null;
-
-    } catch (error) {
-        console.error('Error fetching e621 post:', error);
-        return null;
+        }
     }
+
+    return null;
 }
 
+
 const invoke = async (interaction) => {
-    await interaction.deferReply();
+    try {
+        await interaction.deferReply(); // Start response timer
 
-    const mediaUrl = await getE621Post();
+        const timeout = setTimeout(() => {
+            if (!interaction.replied) {
+                interaction.editReply('⏳ Still fetching post... Please wait.');
+            }
+        }, 2500); // Safety reply if fetch hangs
 
-    if (!mediaUrl) {
-        await interaction.editReply('❌ Failed to fetch post from e621.');
-        return;
+        const mediaUrl = await getE621Post();
+
+        clearTimeout(timeout); // Cancel timeout once we have a result
+
+        if (!mediaUrl) {
+            await interaction.editReply('❌ Failed to fetch post from e621.');
+            return;
+        }
+
+        await interaction.editReply(mediaUrl); // Send image/video URL
+
+    } catch (err) {
+        console.error('Interaction failed:', err);
+
+        if (interaction.deferred || interaction.replied) {
+            await interaction.editReply('❌ Something went wrong.');
+        } else {
+            await interaction.reply('❌ Something went wrong before the reply could be sent.');
+        }
     }
-
-    // Let Discord do the preview automatically
-    await interaction.editReply("Here's your post!\n" + mediaUrl);
 };
+
 
 export { create, invoke };
