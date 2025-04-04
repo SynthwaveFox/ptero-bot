@@ -60,7 +60,7 @@ const invoke = async (interaction) => {
             return;
         }
 
-        await interaction.editReply(mediaUrl); // Send image/video URL
+        await interaction.editReply("Here's your post:" + mediaUrl); // Send image/video URL
 
     } catch (err) {
         console.error('Interaction failed:', err);
