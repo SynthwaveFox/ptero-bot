@@ -17,7 +17,8 @@ const create = () => {
                 .addChoices(
                     { name: 'Safe', value: 'rating:safe' },
                     { name: 'Questionable', value: 'rating:questionable' },
-                    { name: 'Explicit', value: 'rating:explicit' }
+                    { name: 'Explicit', value: 'rating:explicit' },
+                    { name: 'Surprise Me', value: '' }
                 )
         );
 
