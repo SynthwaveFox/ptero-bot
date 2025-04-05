@@ -32,7 +32,7 @@ const e6apikey = process.env.e6ApiKey;
 
 async function getE621PostWithTagAndRating(extraTag, rating, retries = 3) {
     const encodedTag = encodeURIComponent(extraTag.trim());
-    const query = `score:>=500 -young -scat -gore ${rating} ${encodedTag}`;
+    const query = `score:>=0 -young -scat -gore ${rating} ${encodedTag}`;
     const url = `https://e621.net/posts/random.json?tags=${encodeURIComponent(query)}`;
 
     for (let attempt = 1; attempt <= retries; attempt++) {
