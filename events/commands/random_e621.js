@@ -24,9 +24,11 @@ const create = () => {
 };
 
 const e6apikey = process.env.e6ApiKey;
-
 async function getE621Post(rating, retries = 3) {
-    const url = `https://e621.net/posts/random.json?tags=score:>=500+-young+-scat+-gore+${encodeURIComponent(rating)}`;
+    let tagString = 'score:>=500+-young+-scat+-gore';
+    if (rating) tagString += `+${encodeURIComponent(rating)}`;
+
+    const url = `https://e621.net/posts/random.json?tags=${tagString}`;
 
     for (let attempt = 1; attempt <= retries; attempt++) {
         try {
@@ -49,6 +51,7 @@ async function getE621Post(rating, retries = 3) {
 
     return null;
 }
+
 
 const invoke = async (interaction) => {
     try {

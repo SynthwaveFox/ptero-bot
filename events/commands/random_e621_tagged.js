@@ -31,8 +31,13 @@ const create = () => {
 const e6apikey = process.env.e6ApiKey;
 
 async function getE621PostWithTagAndRating(extraTag, rating, retries = 3) {
-    const encodedTag = encodeURIComponent(extraTag.trim());
-    const query = `score:>=0 -young -scat -gore ${rating} ${encodedTag}`;
+    const safeBaseTags = 'score:>=0 -young -scat -gore';
+    const encodedExtraTag = encodeURIComponent(extraTag.trim());
+
+    let query = `${safeBaseTags}`;
+    if (rating) query += ` ${rating}`; // only add rating if it's provided
+    if (extraTag) query += ` ${extraTag.trim()}`; // extra tag already encoded
+
     const url = `https://e621.net/posts/random.json?tags=${encodeURIComponent(query)}`;
 
     for (let attempt = 1; attempt <= retries; attempt++) {
@@ -56,6 +61,7 @@ async function getE621PostWithTagAndRating(extraTag, rating, retries = 3) {
 
     return null;
 }
+
 
 const invoke = async (interaction) => {
     try {
