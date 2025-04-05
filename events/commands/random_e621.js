@@ -8,12 +8,11 @@ const create = () => {
         .addStringOption(option =>
             option.setName('rating')
                 .setDescription('Rating of the post')
-                .setRequired(true)
+                .setRequired(false)
                 .addChoices(
                     { name: 'Safe', value: 'rating:safe' },
                     { name: 'Questionable', value: 'rating:questionable' },
-                    { name: 'Explicit', value: 'rating:explicit' },
-                    { name: 'Surprise Me', value: '' }
+                    { name: 'Explicit', value: 'rating:explicit' }
                 )
         );
 
