@@ -16,7 +16,7 @@ const create = () => {
 const e6apikey = process.env.e6ApiKey;
 
 async function getE621Post(retries = 3) {
-    const url = `https://e621.net/posts/random.json?tags=score:%3E=500+-young+-scat`;
+    const url = `https://e621.net/posts/random.json?tags=score:%3E=500+-young+-scat+-gore`;
 
     for (let attempt = 1; attempt <= retries; attempt++) {
         try {
