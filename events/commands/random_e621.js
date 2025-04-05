@@ -71,7 +71,7 @@ const invoke = async (interaction) => {
             return;
         }
 
-        await interaction.editReply("Here's your post: " + mediaUrl);
+        await interaction.editReply("Here's your post:\n" + mediaUrl);
 
     } catch (err) {
         console.error('Interaction failed:', err);
