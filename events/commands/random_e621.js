@@ -1,4 +1,4 @@
-import { SlashCommandBuilder } from 'discord.js';
+import { SlashCommandBuilder, EmbedBuilder } from 'discord.js';
 import axios from 'axios';
 
 const create = () => {
@@ -23,12 +23,11 @@ const create = () => {
     return commandJSON;
 };
 
-const e6apikey = process.env.e6ApiKey;
-async function getE621Post(rating, retries = 3) {
-    let tagString = 'score:>=500+-young+-scat+-gore';
-    if (rating) tagString += `+${encodeURIComponent(rating)}`;
+const getE621Post = async (rating, retries = 3) => {
+    let baseTags = 'score:>=500 -young -scat -gore';
+    if (rating) baseTags += ` ${rating}`;
 
-    const url = `https://e621.net/posts/random.json?tags=${tagString}`;
+    const url = `https://e621.net/posts/random.json?tags=${encodeURIComponent(baseTags)}`;
 
     for (let attempt = 1; attempt <= retries; attempt++) {
         try {
@@ -39,7 +38,7 @@ async function getE621Post(rating, retries = 3) {
                 }
             });
 
-            return response.data.post?.file?.url ?? null;
+            return response.data.post ?? null;
 
         } catch (error) {
             console.warn(`e621 fetch attempt ${attempt} failed.`);
@@ -50,13 +49,11 @@ async function getE621Post(rating, retries = 3) {
     }
 
     return null;
-}
-
+};
 
 const invoke = async (interaction) => {
     try {
         await interaction.deferReply();
-
         const rating = interaction.options.getString('rating');
 
         const timeout = setTimeout(() => {
@@ -65,16 +62,22 @@ const invoke = async (interaction) => {
             }
         }, 2500);
 
-        const mediaUrl = await getE621Post(rating);
-
+        const post = await getE621Post(rating);
         clearTimeout(timeout);
 
-        if (!mediaUrl) {
+        if (!post || !post.file?.url) {
             await interaction.editReply('❌ Failed to fetch post from e621.');
             return;
         }
 
-        await interaction.editReply("Here's your post:\n" + mediaUrl);
+        const postUrl = `https://e621.net/posts/${post.id}`;
+        const embed = new EmbedBuilder()
+            .setTitle('🔗 View on e621')
+            .setURL(postUrl)
+            .setImage(post.file.url)
+            .setFooter({ text: `Rating: ${post.rating.toUpperCase()} | Score: ${post.score.total}` });
+
+        await interaction.editReply({ embeds: [embed] });
 
     } catch (err) {
         console.error('Interaction failed:', err);

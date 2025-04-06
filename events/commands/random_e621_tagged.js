@@ -1,4 +1,4 @@
-import { SlashCommandBuilder } from 'discord.js';
+import { SlashCommandBuilder, EmbedBuilder } from 'discord.js';
 import axios from 'axios';
 
 const create = () => {
@@ -28,15 +28,11 @@ const create = () => {
     return commandJSON;
 };
 
-const e6apikey = process.env.e6ApiKey;
-
 async function getE621PostWithTagAndRating(extraTag, rating, retries = 3) {
     const safeBaseTags = 'score:>=0 -young -scat -gore';
-    const encodedExtraTag = encodeURIComponent(extraTag.trim());
-
     let query = `${safeBaseTags}`;
-    if (rating) query += ` ${rating}`; // only add rating if it's provided
-    if (extraTag) query += ` ${extraTag.trim()}`; // extra tag already encoded
+    if (rating) query += ` ${rating}`;
+    if (extraTag) query += ` ${extraTag.trim()}`;
 
     const url = `https://e621.net/posts/random.json?tags=${encodeURIComponent(query)}`;
 
@@ -49,7 +45,7 @@ async function getE621PostWithTagAndRating(extraTag, rating, retries = 3) {
                 }
             });
 
-            return response.data.post?.file?.url ?? null;
+            return response.data.post ?? null;
 
         } catch (error) {
             console.warn(`e621 fetch attempt ${attempt} failed.`);
@@ -61,7 +57,6 @@ async function getE621PostWithTagAndRating(extraTag, rating, retries = 3) {
 
     return null;
 }
-
 
 const invoke = async (interaction) => {
     try {
@@ -76,16 +71,23 @@ const invoke = async (interaction) => {
             }
         }, 2500);
 
-        const mediaUrl = await getE621PostWithTagAndRating(tag, rating);
+        const post = await getE621PostWithTagAndRating(tag, rating);
 
         clearTimeout(timeout);
 
-        if (!mediaUrl) {
+        if (!post) {
             await interaction.editReply('❌ Failed to fetch post from e621.');
             return;
         }
 
-        await interaction.editReply("Here's your post:\n" + mediaUrl);
+        const postUrl = `https://e621.net/posts/${post.id}`;
+        const embed = new EmbedBuilder()
+            .setTitle(`e621 Post #${post.id}`)
+            .setURL(postUrl)
+            .setImage(post?.file?.url || null)
+            .setFooter({ text: `Score: ${post.score.total} | Rating: ${post.rating.toUpperCase()}` });
+
+        await interaction.editReply({ content: 'Here\'s your post:\n', embeds: [embed] });
 
     } catch (err) {
         console.error('Interaction failed:', err);
