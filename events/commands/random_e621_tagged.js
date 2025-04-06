@@ -1,4 +1,4 @@
-import { SlashCommandBuilder, EmbedBuilder } from 'discord.js';
+import { SlashCommandBuilder } from 'discord.js';
 import axios from 'axios';
 
 const create = () => {
@@ -28,9 +28,9 @@ const create = () => {
     return commandJSON;
 };
 
-async function getE621PostWithTagAndRating(extraTag, rating, retries = 3) {
-    const safeBaseTags = 'score:>=0 -young -scat -gore';
-    let query = `${safeBaseTags}`;
+const getE621PostWithTagAndRating = async (extraTag, rating, retries = 3) => {
+    const baseTags = 'score:>=0 -young -scat -gore';
+    let query = baseTags;
     if (rating) query += ` ${rating}`;
     if (extraTag) query += ` ${extraTag.trim()}`;
 
@@ -56,7 +56,7 @@ async function getE621PostWithTagAndRating(extraTag, rating, retries = 3) {
     }
 
     return null;
-}
+};
 
 const invoke = async (interaction) => {
     try {
@@ -72,7 +72,6 @@ const invoke = async (interaction) => {
         }, 2500);
 
         const post = await getE621PostWithTagAndRating(tag, rating);
-
         clearTimeout(timeout);
 
         if (!post) {
@@ -80,14 +79,7 @@ const invoke = async (interaction) => {
             return;
         }
 
-        const postUrl = `https://e621.net/posts/${post.id}`;
-        const embed = new EmbedBuilder()
-            .setTitle(`e621 Post #${post.id}`)
-            .setURL(postUrl)
-            .setImage(post?.file?.url || null)
-            .setFooter({ text: `Score: ${post.score.total} | Rating: ${post.rating.toUpperCase()}` });
-
-        await interaction.editReply({ content: 'Here\'s your post:\n', embeds: [embed] });
+        await interaction.editReply(`Here's your post:\n` + `https://e621.net/posts/${post.id}`);
 
     } catch (err) {
         console.error('Interaction failed:', err);

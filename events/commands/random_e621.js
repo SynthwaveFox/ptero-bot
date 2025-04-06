@@ -1,4 +1,4 @@
-import { SlashCommandBuilder, EmbedBuilder } from 'discord.js';
+import { SlashCommandBuilder } from 'discord.js';
 import axios from 'axios';
 
 const create = () => {
@@ -65,19 +65,12 @@ const invoke = async (interaction) => {
         const post = await getE621Post(rating);
         clearTimeout(timeout);
 
-        if (!post || !post.file?.url) {
+        if (!post) {
             await interaction.editReply('❌ Failed to fetch post from e621.');
             return;
         }
 
-        const postUrl = `https://e621.net/posts/${post.id}`;
-        const embed = new EmbedBuilder()
-            .setTitle('🔗 View on e621')
-            .setURL(postUrl)
-            .setImage(post.file.url)
-            .setFooter({ text: `Rating: ${post.rating.toUpperCase()} | Score: ${post.score.total}` });
-
-        await interaction.editReply({ embeds: [embed] });
+        await interaction.editReply(`Here's your post:\n` + `https://e621.net/posts/${post.id}`);
 
     } catch (err) {
         console.error('Interaction failed:', err);
