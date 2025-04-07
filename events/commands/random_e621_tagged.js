@@ -4,7 +4,7 @@ import axios from 'axios';
 const create = () => {
     const command = new SlashCommandBuilder()
         .setName('random_e621_tagged')
-        .setDescription('Replies with a random post from e621.net with a custom tag and rating')
+        .setDescription('Replies with a random post from e621.net with a custom tag, rating, and restriction')
         .addStringOption(option =>
             option.setName('tag')
                 .setDescription('An additional tag to include')
@@ -19,7 +19,19 @@ const create = () => {
                     { name: 'Questionable', value: 'rating:questionable' },
                     { name: 'Explicit', value: 'rating:explicit' }
                 )
-        );
+        )
+        .addStringOption(option =>
+            option.setName('restriction')
+                .setDescription('Gender pairing restriction')
+                .setRequired(false)
+                .addChoices(
+                    { name: 'Male / Female', value: 'male/female' },
+                    { name: 'Male / Male', value: 'male/male' },
+                    { name: 'Female / Female', value: 'female/female' },
+                    { name: 'Male Solo', value: 'solo male' },
+                    { name: 'Female Solo', value: 'solo female' }
+                )
+        );        
 
     const commandJSON = command.toJSON();
     commandJSON.integration_types = [0, 1];
@@ -28,11 +40,13 @@ const create = () => {
     return commandJSON;
 };
 
-const getE621PostWithTagAndRating = async (extraTag, rating, retries = 3) => {
+const getE621PostWithTagAndRating = async (extraTag, rating, restriction, retries = 3) => {
     const baseTags = 'score:>=0 -young -scat -gore';
     let query = baseTags;
+
     if (rating) query += ` ${rating}`;
     if (extraTag) query += ` ${extraTag.trim()}`;
+    if (restriction) query += ` ${restriction}`
 
     const url = `https://e621.net/posts/random.json?tags=${encodeURIComponent(query)}`;
 
@@ -64,6 +78,7 @@ const invoke = async (interaction) => {
 
         const tag = interaction.options.getString('tag');
         const rating = interaction.options.getString('rating');
+        const restriction = interaction.options.getString('restriction');
 
         const timeout = setTimeout(() => {
             if (!interaction.replied) {
@@ -71,7 +86,7 @@ const invoke = async (interaction) => {
             }
         }, 2500);
 
-        const post = await getE621PostWithTagAndRating(tag, rating);
+        const post = await getE621PostWithTagAndRating(tag, rating, restriction);
         clearTimeout(timeout);
 
         if (!post) {
@@ -79,7 +94,7 @@ const invoke = async (interaction) => {
             return;
         }
 
-        await interaction.editReply(`Here's your post:\n` + `https://e621.net/posts/${post.id}`);
+        await interaction.editReply(`Here's your post:\nhttps://e621.net/posts/${post.id}`);
 
     } catch (err) {
         console.error('Interaction failed:', err);
